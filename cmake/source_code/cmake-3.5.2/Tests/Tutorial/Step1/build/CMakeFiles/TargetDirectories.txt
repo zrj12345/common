@@ -1,0 +1,3 @@
+/packages/cmake/source_code/cmake-3.5.2/Tests/Tutorial/Step1/build/CMakeFiles/edit_cache.dir
+/packages/cmake/source_code/cmake-3.5.2/Tests/Tutorial/Step1/build/CMakeFiles/rebuild_cache.dir
+/packages/cmake/source_code/cmake-3.5.2/Tests/Tutorial/Step1/build/CMakeFiles/Tutorial.dir
