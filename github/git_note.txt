@@ -280,6 +280,9 @@
 	1.简单来说就是提交到远程中心仓库的代码必须是按照时间顺序的。
 	2.比如A从中心仓库拿到代码后，对文件f进行了修改。然后push到中心仓库
 	3.B在A之前就拿到了中心仓库的代码，在A push成功之后也对f文件进行了修改。这个时候B也运行push命令推送代码
+	4.参考
+		https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%88%86%E6%94%AF%E7%9A%84%E6%96%B0%E5%BB%BA%E4%B8%8E%E5%90%88%E5%B9%B6
+		搜索"快进"
 		Note:
 			提醒你非快进方式的更新被拒绝了，需要先从中心仓库pull到最新版本，merge后再push.
 			
@@ -289,3 +292,63 @@
 	1.使用iconv -f gbk utf8 inputfile > outfile
 	   示例:
 		iconv -f gbk utf8 git_note.txt > git_note_conv.txt	
+
+10.创建分支,切换分支,合并,删除
+	创建分支
+		git branch testing   -->仅仅是创建了分支testing,并不会自动切换到新的分支中去
+		git log --oneline --decorate    
+			1. 查看各个分支当前所指的对象	
+				eg:
+					git log --oneline --decorate
+						f30ab (HEAD, master, testing) add feature #32 - ability to add new
+						34ac2 fixed bug #1328 - stack overflow under certain conditions
+						98ca9 initial commit of my project	
+					当前"master" 和 "testing" 分支均指向校验和以f30ab开头的提交对象
+				
+
+	切换分支:
+		git checkout testing
+		Note:
+			1.切换分支时,你的工作目录里面的文件会改变。
+	
+		git log --oneline --decorate --graph --all   --> 输出你的提交历史,各个分支的指向以及项目的分支分叉情况。
+		
+	
+	创建并切换分支
+		git branch -b testing         
+			等价于:
+				git branch testing
+				git checkout testing
+				
+	分支合并:
+		git checkout master
+		git merge hotfix
+			-->　将hotfix分支内容合并到当前所处的分支 -> 就是分支master上
+			
+	
+	删除分支:
+		git branch -d hotfix        --> 删除hotfix 分支
+	
+	查看分支:
+		git branch            --> 不带参数查看本地分支
+		git branch -r 		  --> 使用参数-r查看远程仓库分支
+		git branch -all 	  --> 使用参数-all查看所有分支
+		
+		
+	冲突解决:
+		使用图形化工具:
+			git mergetool
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	
+	
+	
+	
