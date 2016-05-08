@@ -1,0 +1,54 @@
+●Program：
+    1.准备想要建造一个可执行的二进制程序，它由 helloscons.c 文件来生成。
+    2.编译成可执行程序(在 Windows 平台上即是 exe 文件)，这是最常用的一种编译类型。
+例子:
+    1.Program('helloscons.c')               ---将helloscons.c 编译成helloscons可执行文件
+    2.Program(myscons, 'helloscons.c')     ---指定生成的可执行文件是myscons
+    3.Program('helloscons2', ['helloscons2.c', 'file1.c', 'file2.c']
+                   ---指定可执行文件由helloscons2.c,file1.c,file2.c三个源代码文件组成
+                   ---若源代码文件过多，可以使用Glob('*.c')代替所有的.c文件
+
+●LIBS： 显示的指明要在链接过程中使用的库，如果有多个库，应该把它们放在一个列表里面。这个例子里，我们使用一个称为 m 的库。
+例子:
+    LIBS = 'm',                ---- 包含名字叫m的库
+    LIBS = ['m','pthread'],    ---- 包含名字叫pthread和m的库，多个库使用列表存放
+●LIBPATH： 链接库的搜索路径，多个搜索路径放在一个列表中。这个例子里，库的搜索路径是 /usr/lib 和 /usr/local/lib。
+例子:
+    LIBPATH = ['/usr/lib','/usr/local/lib']
+●CCFLAGS： 编译选项，可以指定需要的任意编译选项，如果有多个选项，应该放在一个列表中。这个例子里，编译选项是通过 -D 这个 gcc 的选项定义了一个宏 HELLOSCONS。
+例子:
+    CCFLAGS = '-DHELLOSCONS'         --定义一个宏HELLOSCONS
+
+Object： 只编译成目标文件。使用这种类型，编译结束后，只会产生目标文件。在 POSIX 系统中，目标文件以 .o 结尾，在 Windows 平台上以 .OBJ 结尾。
+Library： 编译成库文件。SCons 默认编译的库是指静态链接库。
+StaticLibrary： 显示的编译成静态链接库，与上面的 Library 效果一样。
+SharedLibrary： 在 POSIX 系统上编译动态链接库，在 Windows 平台上编译 DLL
+
+
+
+-c:执行清理任务
+-Q:减少编译时的由scons产生的冗余信息
+
+参考:
+    http://os.51cto.com/art/201104/257443_1.htm
+
+
+实例1:
+import sys 
+reload(sys)
+sys.setdefaultencoding("utf8")
+
+Program('netcommu',Glob('*.cpp'),
+       LIBS = ['pthread','helper'],
+       CPPPATH = ['include',['../LibHelper/inc','./inc']],
+       LIBPATH = ['/usr/lib','/usr/local/lib','usr/lib64/lib'],
+       CCFLAGS = '-g'
+       )  
+
+
+
+
+
+
+
+    
