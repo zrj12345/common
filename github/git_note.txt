@@ -417,4 +417,54 @@
 	冲突解决:
 		使用图形化工具:
 			git mergetool
+		
+		
+11.服务器上的Git   -- 协议
+	协议有四种:本地协议（Local），HTTP协议，SSH协议，Git协议
+		本地协议:
+		
+		
+		HTTP协议:
+			智能HTTP协议:
+				1.支持像 git:// 协议一样设置匿名服务，
+				2.支持像 SSH 协议一样提供传输时的授权和加密，而且只用一个URL就可以做到。
+		 
+			哑(Dumb) HTTP协议:    --> 参考post-update的挂钩
+				1.哑 HTTP 协议里 web 服务器仅把裸版本库当作普通文件来对待，提供文件服务
+				2.Git 自带的 post-update 挂钩会默认执行合适的命令（git update-server-info），来确保通过 HTTP 的获取和克隆操作正常工作。
+				3.然后别人就可以通过类似下面的命令来克隆：git clone https://example.com/gitproject.git
+				
 			
+		SSH协议；
+			示例:
+				1.git clone ssh://user@server/project.git
+				2.git clone user@server:project.git 
+				Note:
+					不指定用户名，则git会使用当前登录的用户名.
+				优点:
+					1.SSH 架设相对简单 —— SSH 守护进程很常见
+					2.SSH 访问是安全的 —— 所有传输数据都要经过授权和加密
+					3.，SSH 协议很高效，在传输前也会尽量压缩数据
+				缺点:
+					1.不能通过他实现匿名访问
+		Git协议:
+			Note:
+				 1.Git 协议是包含在 Git 里的一个特殊的守护进程；它监听在一个特定的端口（9418）
+				 2.访问无需任何授权
+				 3.要让版本库支持 Git 协议，需要先创建一个 git-daemon-export-ok 文件
+		
+			优点:
+				1.Git 协议是 Git 使用的网络传输协议里最快的
+			
+			缺点:
+				1.Git 协议缺点是缺乏授权机制
+				2.它要求有自己的守护进程
+				3.要求防火墙开放 9418 端
+		
+		
+		
+		
+	
+	
+	
+	
