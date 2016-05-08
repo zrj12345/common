@@ -463,7 +463,33 @@
 				3.要求防火墙开放 9418 端
 		
 		
+12.在服务器上搭建Git
+	架设之前:
+		1.需要把现有仓库导出为裸仓库 
+			git  clone --bare my_project my_project.git   --> 仓库名称以.git结尾
+				等同于:
+			cp -Rf my_project/.git  my_project.git
+							
+					--> 以上操作只是取出Git仓库自身.不要工作目录,然后特别为他创建一个目录
+					
+	
+	把裸仓库放到服务器上，设置Git协议:
+		scp -r my_project.git user@git.example.com:/opt/git   --> 假设git.example.com为服务器地址,/opt/git为服务器目录
 		
+		之后:
+			其他人可以使用:
+				git clone user@git.example.com:/opt/git/my_project.git  命令克隆你的仓库.
+							--> 该用户必须对/opt/git目录拥有可读权限
+		
+				
+		Note:
+			1.如果到该项目目录中运行 git init 命令，并加上 --shared 选项，那么 Git 会自动修改该仓库目录的组权限为可写
+			Example:
+				$ ssh user@git.example.com
+				$ cd /opt/git/my_project.git
+				$ git init --bare --shared
+				
+	
 		
 	
 	

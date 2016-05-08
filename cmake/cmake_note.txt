@@ -1,0 +1,197 @@
+1.cmake1 示例
+	1.CMakeLists.txt文件名是大小写相关的，如果工程存在多个目录，需要确保每个要管理的目录都存在一个
+CMakeLists.txt
+	2.PROJECT指令的语法是：
+		PROJECT(projectname [CXX] [C] [Java])
+			1.你可以用这个指令定义工程名称，并可指定工程支持的语言，支持的语言列表是可以忽略的，默认情况表示支持所有语言
+			2.这个指令隐式的定义了两个cmake变量:<projectname>_BINARY_DIR以及<projectname>_SOURCE_DIR
+				这里就是HELLO_BINARY_DIR和HELLO_SOURCE_DIR
+			3.因为采用的是内部编译，两个变量目前指的都是工程所在路径/backup/cmake/t1，
+			4.cmake系统给我们预定于变量PROJECT_BINARY_DIR和PROJECT_SOURCE_DIR变量，他们的值分别跟HELLO_BINARY_DIR与HELLO_SOURCE_DIR一致
+			
+	SET指令的语法是：
+		SET(VAR [VALUE] [CACHE TYPE DOCSTRING [FORCE]])
+		示例:
+			SET(SRC_LIST main.c)，
+			SET(SRC_LIST main.c t1.c t2.c)。
+			
+	MESSAGE指令的语法是：
+		MESSAGE([SEND_ERROR | STATUS | FATAL_ERROR] "message to display"...)
+			SEND_ERROR，产生错误，生成过程被跳过。
+			SATUS，输出前缀为—的信息。
+			FATAL_ERROR，立即终止所有cmake过程.
+			
+	基本语法规则
+		1，变量使用${}方式取值，但是在IF控制语句中是直接使用变量名
+		2. 指令(参数1 参数2...)
+			示例:
+				ADD_EXECUTABLE(hello main.c func.c)
+				ADD_EXECUTABLE(hello main.c;fuc.c)
+				ADD_EXECUTABLE(hello "main.c")
+		3. 指令是大小写无关的，参数和变量是大小写相关的
+		
+	cmake有make clean 但是没有make distclean指令
+	
+		
+		
+2.cmake2 示例       --> 使用的是外部编译
+	1.ADD_SUBDIRECTORY指令
+		ADD_SUBDIRECTORY(source_dir [binary_dir] [EXCLUDE_FROM_ALL])
+			1.这个指令用于向当前工程添加存放源文件的子目录，
+			2.并可以指定中间二进制和目标二进制存放的位置
+			3.EXCLUDE_FROM_ALL参数的含义是将这个目录从编译过程中排除
+			4.指定bin目录后，相当于在编译时将build/src重命名为build/bin
+			5.如果不进行bin目录的指定，那么编译结果(包括中间结果)都将存放在build/src目录(这个目录跟原有的src目录对应)
+		
+	2.SUBDIRS指令
+		1.SUBDIRS(dir1 dir2...)，但是这个指令已经不推荐使用。
+		2.ADD_SUBDIRECTORY (src bin)修改为SUBDIRS(src)的话,会在build目录中将出现一个src目录
+		
+	3.EXECUTABLE_OUTPUT_PATH和LIBRARY_OUTPUT_PATH
+		1.定义最终生成的二进制文件或者库文件的输出路径
+			示例:
+				SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+				SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+			
+			PROJECT_BINARY_DIR --> 指的是编译二进制文件目录，本例指的是build目录
+			PROJECT_BINARY_DIR --> 指的是编译库文件目录，本例指的是build目录
+			Note:
+				在哪里添加的ADD_EXECUTABLE就把文件输出路径填写在哪里
+				
+	4.安装    --> INSTALL 和 CMAKE_INSTALL_PREFIX
+		安装可执行文件和库文件    --> 需提前声明CMAKE_INSTALL_PREFIX变量的值。
+		INSTALL(
+					TARGETS targets...
+					[	
+						[ARCHIVE|LIBRARY|RUNTIME]
+						[DESTINATION <dir>]
+						[PERMISSIONS permissions...]
+						[CONFIGURATIONS
+							[Debug|Release|...]
+						]
+						[COMPONENT <component>]
+						[OPTIONAL]
+					] [...]
+				)
+				
+			1.TARGETS后面跟的就是我们通过ADD_EXECUTABLE或者ADD_LIBRARY定义的目标文件，可能是可执行二进制、动态库、静态库
+			2.ARCHIVE特指静态库，LIBRARY特指动态库，RUNTIME特指可执行目标二进制
+		
+		示例：
+			INSTALL(
+					TARGETS myrun mylib mystaticlib
+					RUNTIME DESTINATION bin
+					LIBRARY DESTINATION lib
+					ARCHIVE DESTINATION libstatic
+					)
+							
+			1.可执行二进制myrun安装到${CMAKE_INSTALL_PREFIX}/bin目录
+			2.动态库libmylib安装到${CMAKE_INSTALL_PREFIX}/lib目录
+			3.静态库libmystaticlib安装到${CMAKE_INSTALL_PREFIX}/libstatic目录
+		
+		
+		安装一般文件:
+		INSTALL(
+				FILES files... DESTINATION <dir>
+				[PERMISSIONS permissions...]
+				[CONFIGURATIONS 
+					[Debug|Release|...]
+				]
+				[COMPONENT <component>]
+				[RENAME <name>] [OPTIONAL]
+			   )
+					
+			Note:
+				1.文件名是此指令所在路径下的相对路径。
+				2.如果默认不定义权限PERMISSIONS，安装后的权限为:
+					OWNER_WRITE,OWNER_READ,GROUP_READ,WORLD_READ
+		
+		非目标文件的可执行程序安装(比如脚本文件)
+		INSTALL(
+				PROGRAMS files... DESTINATION <dir>
+				[PERMISSIONS permissions...]
+				[CONFIGURATIONS 
+					[Debug|Release|...]
+				]
+				[COMPONENT <component>]
+				[RENAME <name>] [OPTIONAL]
+				)
+			Note:
+				跟上面的FILES指令使用方法一样，唯一的不同是安装后权限为:
+				OWNER_EXECUTE, GROUP_EXECUTE, 和WORLD_EXECUTE，即755权限	
+		
+		目录的安装:
+			INSTALL(
+					DIRECTORY dirs... DESTINATION <dir>
+					[FILE_PERMISSIONS permissions...]
+					[DIRECTORY_PERMISSIONS permissions...]
+					[USE_SOURCE_PERMISSIONS]
+					[CONFIGURATIONS
+						[Debug|Release|...]
+					]
+					[COMPONENT <component>]
+					[[PATTERN <pattern> | REGEX <regex>]
+						[EXCLUDE] [PERMISSIONS permissions...]
+					]
+					[...]
+					)
+				1.DIRECTORY后面连接的是所在Source目录的相对路径
+					目录名abc 和 目录名abc/的区别:
+						abc   ---> abc这个目录将被安装为目标路径下的abc
+						abc/  ---> 安装abc/目录下的内容到目标路径，不包括本身。
+				2.PATTERN用于使用正则表达式进行过滤，PERMISSIONS用于指定PATTERN过滤后的文件权限。
+				
+			示例:
+				INSTALL(
+						DIRECTORY icons scripts/ DESTINATION share/myproject
+						PATTERN "CVS" EXCLUDE                       -->不包含目录名为CVS的目录
+						PATTERN "scripts/*"
+						PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+						GROUP_EXECUTE GROUP_READ)
+						
+		
+		安装时Cmake脚本的执行:
+			INSTALL(
+					[[SCRIPT <file>] [CODE <code>]] [...]
+					)
+				1.SCRIPT参数用于在安装时调用cmake脚本文件（也就是<abc>.cmake文件）
+				2.CODE参数用于执行CMAKE指令，必须以双引号括起来
+			示例:
+				INSTALL(CODE "MESSAGE(\"Sample install message.\")")
+		
+3.cmake3示例     --> 增加文件安装示例 (make install)
+		1.在cmake2的基础上修改主工程文件CMakeLists.txt
+			增加:
+				INSTALL(FILES COPYRIGHT README DESTINATION share/doc/cmake/t2)   --> 安装一般文件
+				INSTALL(PROGRAMS runhello.sh DESTINATION bin)					 --> 安装非目标文件的可执行文件
+				INSTALL(DIRECTORY doc/ DESTINATION share/doc/cmake/t2)			 --> 安装目录文件
+				
+		在build目录下执行:
+			1.cmake -DMAKE_INSTALL_PREFIX=/tmp/cmake3     --> MAKE_INSTALL_PREFIX 安装路径都要依赖这个cmake内置变量,
+				Note:
+					不指定MAKE_INSTALL_PREFIX值得话，默认是/usr
+			2.make
+			3.make install
+		
+		
+				
+4.cmake4示例     --> 静态库和动态库构建	
+	
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+		
+		
+		
+		
+		
+		
+		
+		
