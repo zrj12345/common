@@ -15,6 +15,31 @@
 			git config --system user.name "zhangrj"
 			git config --system user.email "qzhangrongjie@163.com"
 		
+		避免每次输入密码:
+			1.通用平台方法:
+				1.git config --global credential.helper cache
+					密码永远不会被存储在磁盘中，并且在15分钟后从内存中清除（默认15分钟）
+				2.git config --global  credential.helper  'cache --timeout 3600'   
+					设置后每次输入密码将保存一小时(3600秒)
+				3.git config --global  credential.helper  store
+					” store” 模式会将凭证用明文的形式存放在磁盘中(home 目录下)，并且永不过期
+					 示例:
+						git config --global credential.helper store --file ~/.my-credentials
+								默认文件路径是~/.git-credentials
+				3.将url地址修改:
+					例如:
+						url = https://github.com/zrj12345/common
+						 修改为:
+						url = https://zrj12345:ghpasswd0714@github.com/zrj12345/common
+						 其格式为:
+						url = https://用户名:密码@github.com/zrj12345/common
+			2.另外:
+				1.windows 平台设置:
+				2.mac平台设置:
+			
+			4.参考：https://git-scm.com/book/zh/v2/Git-%E5%B7%A5%E5%85%B7-%E5%87%AD%E8%AF%81%E5%AD%98%E5%82%A8
+			
+			
 		文本编辑器:
 			git config --global core.editor  emacs         --> 默认是vim 这个配置不是必须的
 			
@@ -84,7 +109,7 @@
 				git clone [url]
 			示例:
 				git clone https://github.com/libgit2/libgit2
-				git clone https://github.com/libgit2/libgit2 mylibgit  --> 自定义仓库名称
+				git clone https://github.com/libgit2/libgit2 [-o] mylibgit  --> 自定义仓库名称
 					
 			
 3.提交，暂存，状态，移除，移动,提交历史
@@ -167,7 +192,13 @@
 		
 		与git clone的区别:
 			1.git clone 克隆一个远程仓库,命令会自动将其添加为远程仓库并默认以 “origin” 为简写
-			2.git fetch 命令会将数据拉取到你的本地仓库 - 它并不会自动合并或修改你当前的工作
+			2.git fetch 
+				1.命令会将数据拉取到你的本地仓库 - 它并不会自动合并或修改你当前的工作
+				2.从远程仓库拉取本地没有的数据,并且更新本地数据库,移动origin/master指针指向新的,更新后的位置
+			
+		与git pull的区别:
+			1.git pull 相当于是从远程获取最新版本并merge到本地
+			2.git pull = git fetch + git merge()
 			
 	推送到远程仓库:
 		git push [remote-name] [branch-name]
@@ -293,6 +324,8 @@
 	   示例:
 		iconv -f gbk utf8 git_note.txt > git_note_conv.txt	
 
+		
+
 10.创建分支,切换分支,合并,删除
 	创建分支
 		git branch testing   -->仅仅是创建了分支testing,并不会自动切换到新的分支中去
@@ -327,28 +360,61 @@
 			
 	
 	删除分支:
-		git branch -d hotfix        --> 删除hotfix 分支
+		git branch -d hotfix        --> 删除hotfix 分支,hotfix分支必须完全到当前分支(HEAD分支)，否则合并会报错
+		
+		git branch -D hotfix        --> 删除分支hotfix时,不考虑hotfix的合并状态。
 	
 	查看分支:
-		git branch            --> 不带参数查看本地分支
+		git branch                --> 不带参数查看本地分支
 		git branch -r 		  --> 使用参数-r查看远程仓库分支
 		git branch -all 	  --> 使用参数-all查看所有分支
+			Note:
+				*号 表示现在检出的哪一个分支(也就是HEAD指向的分支)
+		git branch -v -a 查看每一个分支的最后一次提交
 		
-		
+		git branch --merged          --> 查看哪些分支已经合并到当前分支的分支
+		git branch --no-merged       --> 查看哪些分支已经尚未合并到当前分支的分支
+		git ls-remote (remote)       --> 显式地获得远程引用的完整列表。
+		git remote show (remote)     --> 获得远程分支的更多信息。
+	
+	远程跟踪分支:
+		1.是远程分支状态的引用,它们是你不能移动的本地引用.
+		2.当你做任何网络通信操作时，它们会自动移动.  --例如git fetch 操作,会移动 origin/master 指针指向新的、更新后的位置
+		3.从一个远程跟踪分支检出一个本地分支会自动创建一个叫做 “跟踪分支”（有时候也叫做 “上游分支”）。
+		4.设置跟踪分支:
+			git checkout --track origin/serverfix   --> 本地分支与远程分支名字相同为serverfix
+			git checkout --track origin/serverfix   --> 本地分支名字为 sf
+			git checkout -b sf   origin/serverfix   --> 本地分支名字为 sf
+		5.修改正在跟踪的上游分支:
+			git branch -u origin/serverfix              -u = -set-upstream-to
+			
+		6.查看设置的所有跟踪分支
+			git branch -vv
+		7.删除远程分支
+			git push origin --delete serverfix
+			
+	本地分支与远程分支的同步:
+		git fetch origin:
+			1.这个命令不会自动将本地仓库与远程仓库进行同步。
+			参考:
+				https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF\
+			搜索"如果要同步你的工作，运行 git fetch origin 命令"   就行理解.
+			
+	推送:      -->  将本地仓库与远程仓库进行同步
+		git push (remote) (branch):
+			示例:
+				1.git push origin serverfix
+					1.git 会自动将serverfix展开为  refs/heads/serverfix:refs/heads/serverfix  
+							--> 意思是推送本地serverfix分支类更新远程仓库的serverfix分支
+				2.git push origin serverfix:serverfix
+					将本地的 serverfix 分支推送到远程仓库上的 serverfix 分支
+				3.git push origin serverfix:serverfix
+					将本地的 serverfix 分支推送到远程仓库上的 awesomebranch 分支
+		参考
+			http://www.yiibai.com/git/git_push.html 详细说明
+			
+	
 	冲突解决:
 		使用图形化工具:
 			git mergetool
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-	
-	
-	
-	
+			
