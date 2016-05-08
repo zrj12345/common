@@ -1,0 +1,9 @@
+Program(
+	'four_pattern',[
+			'RabbitMQ_Adapter.cpp','general.cpp','four_pattern.cpp','RabbitMQ.cpp',  \
+			'common/BaseThread.cpp','common/err.cpp','common/log/log.cpp','common/IniFile/IniFile.cpp'
+			],
+	LIBS = ['pthread','rabbitmq'],
+	LIBPATH = ['/usr/lib','/usr/local/lib'],
+	CPPPATH = ['include','common','common/log','common/IniFile','/usr/local/include']
+	)

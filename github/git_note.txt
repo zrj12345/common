@@ -323,6 +323,7 @@
 	1.使用iconv -f gbk utf8 inputfile > outfile
 	   示例:
 		iconv -f gbk utf8 git_note.txt > git_note_conv.txt	
+		iconv --from-code=gbk -to-code=utf8 git_note.txt > git_note_conv.txt	
 
 		
 
